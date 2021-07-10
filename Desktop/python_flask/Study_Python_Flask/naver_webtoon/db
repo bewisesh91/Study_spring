@@ -1,0 +1,36 @@
+--User 데이터 생성
+INSERT INTO users(id, name, email, passwd)
+VALUES (null, 'tester', 'tester@gmail.com',
+        '1ARVn2Auq2/WAqx2gNrL+q3RNjAzXpUfCXrzkA6d4Xa22yhRLy4AC50E+6UTPoscbo31nbOoq51gvkuXzJ6B2w==') --비밀번호:1234
+;
+
+--Cartoon 데이터 생성
+INSERT INTO cartoons(id, title, artist_name, weekday, genre, finished)
+VALUES (null, '작품1', '작가1', 1, 'FANTASY', 0),
+       (null, '작품2', '작가2', 1, 'STORY', 0),
+       (null, '작품3', '작가3', 2, 'SPORTS', 0),
+       (null, '작품4', '작가4', 3, 'OMNIBUS', 1),
+       (null, '작품5', '작가5', 4, 'STORY', 0)
+;
+
+--Episode 데이터 생성
+INSERT INTO episodes(id, cartoon_id, seq, title, tot_revw_pnt, tot_revw_cnt, create_at)
+VALUES (null, 1, 1, '작품1 1화', 0, 0, '2021-06-01 23:45:00'),
+       (null, 1, 2, '작품1 2화', 8, 3, '2021-06-02 22:15:00'),
+       (null, 4, 1, '작품4 1화', 13, 3, '2021-05-01 21:10:00'),
+       (null, 4, 2, '작품4 2화', 9, 2, '2021-05-02 22:22:00'),
+       (null, 4, 3, '작품4 3화', 4, 1, '2021-05-03 20:54:00')
+;
+
+--Review 데이터 생성
+INSERT INTO reviews(id, episode_id, user_id, point, aftr_tot_revw_pnt, aftr_tot_revw_cnt)
+VALUES (null, 2, 1, 5, 5, 1),
+       (null, 2, 1, 2, 7, 2),
+       (null, 2, 1, 1, 8, 3),
+       (null, 3, 1, 5, 5, 1),
+       (null, 3, 1, 5, 10, 2),
+       (null, 3, 1, 3, 13, 3),
+       (null, 4, 1, 4, 4, 1),
+       (null, 4, 1, 5, 9, 2),
+       (null, 5, 1, 4, 4, 1)
+;

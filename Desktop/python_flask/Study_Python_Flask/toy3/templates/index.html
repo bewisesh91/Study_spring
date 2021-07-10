@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> SW사관학교 정글| 간단메모 </title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+        crossorigin="anonymous"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+    <style>
+        * {
+            font-family: 'Stylish', sans-serif;
+        }
+
+        .wrap {
+            width: 900px;
+            margin: 10px auto;
+        }
+
+        .header-title {
+            font-weight: bold;
+            padding-right: 15px;
+        }
+
+        .header-title-area {
+            display: flex;
+        }
+
+        .header-title-button {
+            height: 60px;
+            text-align: center;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .card-comment {
+            color: grey;
+            font-weight: bold;
+        }
+
+        .card-adj {
+            font-size: 15px;
+            height: 30px;
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .card-delete {
+            font-size: 15px;
+            height: 30px;
+            margin-bottom: 10px;
+        }
+
+        .posting-box {
+            display: none;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            $('#cards-box').html("");
+            listing();
+        });
+
+        function posting() {
+            let title = $('#memo-title').val();
+            let comment = $('#memo-comment').val();
+            console.log(title, comment)
+
+            $.ajax({
+                type: "POST",
+                url: "/memo",
+                data: { title_give: title, comment_give: comment },
+                success: function (response) { // 성공하면
+                    if (response["result"] == "success") {
+                        alert("포스팅 완료");
+                        window.location.reload();
+                    } else {
+                        alert("서버 오류")
+                    }
+                }
+            })
+        }
+
+        function listing() {
+            $.ajax({
+                type: "GET",
+                url: "/memo",
+                data: {},
+                success: function (response) {
+                    console.log(response)
+                    let memoDatas = response["memoDatas"];
+                    for (let i = 0; i < memoDatas.length; i++) {
+                        post(memoDatas[i]["title"], memoDatas[i]["comment"], memoDatas[i]["_id"])
+                    }
+                }
+            })
+        }
+
+        function post(title, comment, id) {
+            let temp_html = `<div class="card">
+                                <div class="card-body" id=card-${id}>
+                                    <h5 class="card-title"> ${title} </h5>
+                                    <p class="card-text card-comment"> ${comment} </p>
+                                </div>
+                                <button onclick="openClose(${id})" type="button" class="card-adj btn btn-secondary"> 수정 </button>
+                                <button onclick="cardDelete(${title})" type="button" class="card-delete btn btn-dark"> 삭제 </button>
+                            </div>`;
+            $("#cards-box").append(temp_html);
+            let temp_html2 = `<div class="posting-box" id="posting-box-${id}">
+                                    <form>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="admemo-title" placeholder="${title}">
+                                        </div>
+                                        <div class="form-group">
+                                            <textarea class="form-control" id="admemo-comment" rows="5" placeholder="${comment}"></textarea>
+                                        </div>
+                                        <button onclick="cardAdjust(${id})" type="submit" class="btn btn-primary"> 저장</button>
+                                    </form>
+                            </div>`
+            $("#cards-box").append(temp_html2);
+        }
+
+        function openClose(id) {
+            let status = $("#posting-box").css('display')
+            if (status == 'block') {
+                $('#posting-box').hide()
+            } else {
+                $('#posting-box').show()
+            }
+        }
+
+        function cardAdjust(id) {
+            let cardId= id
+            let title = $('#admemo-title').val();
+            let comment = $('#admemo-comment').val();
+
+            $.ajax({
+                type: "POST",
+                url: "/memo",
+                data: { cardId_give: cardId, adtitle_give: title, adcomment_give: comment },
+                success: function (response) { // 성공하면
+                    if (response["result"] == "success") {
+                        alert("수정 완료");
+                        window.location.reload();
+                    } else {
+                        alert("서버 오류")
+                    }
+                }
+            })
+        }
+
+        function cardDelete(title) {
+            $.ajax({
+                type: "POST",
+                url: "/memo",
+                data: { 'title_give': title },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert('삭제 완료')
+                        window.location.reload()
+                    }
+                }
+            })
+        }
+
+    </script>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <div class="header jumbotron">
+            <div class="header-title-area">
+                <h1 class="header-title display-4"> 나홀로메모장 </h1>
+                <button type="button" class="header-title-button btn btn-secondary">ver2.0</button>
+            </div>
+
+            <form>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="memo-title" placeholder="메모 제목을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" id="memo-comment" rows="5" placeholder="내용을 입력하세요."></textarea>
+                </div>
+                <button onclick="posting()" type="submit" class="btn btn-primary"> 저장히기 </button>
+            </form>
+        </div>
+
+        <div id="cards-box" class="card-columns">
+        </div>
+    </div>
+</body>
+
+</html>
